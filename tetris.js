@@ -100,5 +100,74 @@ function triggerCombinationEffect(block) {
 // 初始化和渲染遊戲
 const canvas = document.getElementById('tetris');
 const context = canvas.getContext('2d');
+context.scale(20, 20);
 
-// 這裡可以添加更多的遊戲初始化和渲染邏輯 
+function drawMatrix(matrix, offset) {
+    matrix.forEach((row, y) => {
+        row.forEach((value, x) => {
+            if (value !== 0) {
+                context.fillStyle = 'red'; // 可以根據方塊類型設置不同顏色
+                context.fillRect(x + offset.x, y + offset.y, 1, 1);
+            }
+        });
+    });
+}
+
+function draw() {
+    context.clearRect(0, 0, canvas.width, canvas.height);
+    drawMatrix(player.matrix, player.pos);
+}
+
+function createMatrix(w, h) {
+    const matrix = [];
+    while (h--) {
+        matrix.push(new Array(w).fill(0));
+    }
+    return matrix;
+}
+
+function createPiece(type) {
+    if (type === 'T') {
+        return [
+            [0, 0, 0],
+            [5, 5, 5],
+            [0, 5, 0],
+        ];
+    }
+    // 可以添加其他類型的方塊
+}
+
+const player = {
+    pos: {x: 5, y: 5},
+    matrix: createPiece('T'),
+};
+
+let dropCounter = 0;
+let dropInterval = 1000;
+let lastTime = 0;
+
+function update(time = 0) {
+    const deltaTime = time - lastTime;
+    lastTime = time;
+
+    dropCounter += deltaTime;
+    if (dropCounter > dropInterval) {
+        player.pos.y++;
+        dropCounter = 0;
+    }
+
+    draw();
+    requestAnimationFrame(update);
+}
+
+document.addEventListener('keydown', event => {
+    if (event.keyCode === 37) {
+        player.pos.x--;
+    } else if (event.keyCode === 39) {
+        player.pos.x++;
+    } else if (event.keyCode === 40) {
+        player.pos.y++;
+    }
+});
+
+update(); 
